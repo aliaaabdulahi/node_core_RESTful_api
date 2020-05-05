@@ -15,15 +15,23 @@ const todos = [
 
 const server = http.createServer((req, res) =>{
 //this method allows us to create servers that take requests and send back responses
+res.statusCode = 404; // how to manually send a status code (right now its automatic)
 res.setHeader('Content-Type', 'application/json'); // first param is the header key(content-type), then key (which is text/plain)
-res.setHeader('X-Powered-By', 'Node.js')
+res.setHeader('X-Powered-By', 'Node.js');
+
+res.writeHead(404, { //how to set status code & header information at once
+    'Content-Type': 'application/json',
+    'X-Powered-By': 'Node.js'
+})
+
 res.write('<h1>hello</h1>');
 res.write('<h2>hello</h2>');
 res.end(JSON.stringify({
-    success:true,
-    data: todos
+    success:false, //set this false to indicate that its a 404
+    data: null,
+    error: 'Not Found' //null bc not found
     // the data coming back will be the todos. The parameter of res.end is an object, JSON.stringify is what is going to turn it into a string so it can be parsed as one
-}); // to get a correct response back. ends teh response wihtout getting any data. as long as there is no error will always be a 200 response. when we make a request and get the data value back. when we use express we don't have to do stringify, or put the headers, but using node modules lets you know how things happen under the hood
+})); // to get a correct response back. ends teh response wihtout getting any data. as long as there is no error will always be a 200 response. when we make a request and get the data value back. when we use express we don't have to do stringify, or put the headers, but using node modules lets you know how things happen under the hood
 });
 
 const PORT = 5000; 

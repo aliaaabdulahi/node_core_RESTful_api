@@ -15,14 +15,26 @@ const todos = [
 
 const server = http.createServer((req, res) =>{
 //this method allows us to create servers that take requests and send back responses
-res.statusCode = 404; // how to manually send a status code (right now its automatic)
-res.setHeader('Content-Type', 'application/json'); // first param is the header key(content-type), then key (which is text/plain)
-res.setHeader('X-Powered-By', 'Node.js');
+// res.statusCode = 200; // how to manually send a status code (right now its automatic)
+// res.setHeader('Content-Type', 'application/json'); // first param is the header key(content-type), then key (which is text/plain)
+// res.setHeader('X-Powered-By', 'Node.js');
 
-res.writeHead(404, { //how to set status code & header information at once
+res.writeHead(200, { //how to set status code & header information at once
     'Content-Type': 'application/json',
     'X-Powered-By': 'Node.js'
-})
+});
+
+let body = [];
+
+req.on('data', chunk => {
+    body.push(chunk)
+}).on('end', () => {
+    body = Buffer.concat(body).toString();
+    console.log(body) 
+}) // you have to listen to the request and the request is a readable stream of data and events. rquest on certain events, so on data, we take in chunk parameter, we push chunk onto body & on event 'end' , we have access to buffer, which lets us concat to the body
+
+console.log(req.headers.authorization)
+
 
 res.write('<h1>hello</h1>');
 res.write('<h2>hello</h2>');

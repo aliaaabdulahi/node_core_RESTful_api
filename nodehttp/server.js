@@ -54,6 +54,18 @@ req.on('data', chunk => {
     }
 
     // examples of how a get and post request would be done with just pure node core HTTP module
+    // one req of an event data, we pass parameter chunk to be pushed onto the body array 
+    // body array is a concatinated version of body
+    // we will make teh status 404 when it starts
+    // the status will default to null and false
+    // the only exception is if they go to the specific routes we wrote
+    // and if they are post and get methods
+    // id and text are properties of the JSON
+    // if there is no id or text then there is an error
+    //else push the id and text object to the body with a 201 error
+    //and change the default response as well
+
+
 
     res.writeHead(status, { //how to set status code & header information at once
         'Content-Type': 'application/json',

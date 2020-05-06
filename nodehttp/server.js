@@ -19,10 +19,7 @@ const server = http.createServer((req, res) =>{
 // res.setHeader('Content-Type', 'application/json'); // first param is the header key(content-type), then key (which is text/plain)
 // res.setHeader('X-Powered-By', 'Node.js');
 
-res.writeHead(200, { //how to set status code & header information at once
-    'Content-Type': 'application/json',
-    'X-Powered-By': 'Node.js'
-});
+const { method, url } = req;
 
 let body = [];
 
@@ -30,20 +27,53 @@ req.on('data', chunk => {
     body.push(chunk)
 }).on('end', () => {
     body = Buffer.concat(body).toString();
-    console.log(body) 
+
+    let status = 404;
+    const response = {
+        success: false,
+        data: null,
+        error: null
+    };
+
+    if (method === 'GET' && url === '/todos') {
+        status = 200;
+        response.success = true;
+        response.data = todos;
+    } else if (method === 'POST' && url === '/todos') { 
+       const { id, text} = JSON.parse(body);
+
+       if (!id || text) {
+        status=404;
+        response.error = 'please add id and text';
+       } else {
+        todos.push({ id, text});
+        status = 201;
+        response.success = true;
+        response.data = todos;
+       }
+    }
+
+    // examples of how a get and post request would be done with just pure node core HTTP module
+
+    res.writeHead(status, { //how to set status code & header information at once
+        'Content-Type': 'application/json',
+        'X-Powered-By': 'Node.js'
+    });
+
+    res.end(
+        JSON.stringify(response)
+    )
+    // res.end(JSON.stringify({
+    //     success:false, //set this false to indicate that its a 404
+    //     data: null,
+    //     error: 'Not Found' //null bc not found
+    //     // the data coming back will be the todos. The parameter of res.end is an object, JSON.stringify is what is going to turn it into a string so it can be parsed as one
+    // })); // to get a correct response back. ends teh response wihtout getting any data. as long as there is no error will always be a 200 response. when we make a request and get the data value back. when we use express we don't have to do stringify, or put the headers, but using node modules lets you know how things happen under the hood
+
+
+    // we need to move what we need to in this method bc this is where we actually have access to the body data 
 }) // you have to listen to the request and the request is a readable stream of data and events. rquest on certain events, so on data, we take in chunk parameter, we push chunk onto body & on event 'end' , we have access to buffer, which lets us concat to the body
 
-console.log(req.headers.authorization)
-
-
-res.write('<h1>hello</h1>');
-res.write('<h2>hello</h2>');
-res.end(JSON.stringify({
-    success:false, //set this false to indicate that its a 404
-    data: null,
-    error: 'Not Found' //null bc not found
-    // the data coming back will be the todos. The parameter of res.end is an object, JSON.stringify is what is going to turn it into a string so it can be parsed as one
-})); // to get a correct response back. ends teh response wihtout getting any data. as long as there is no error will always be a 200 response. when we make a request and get the data value back. when we use express we don't have to do stringify, or put the headers, but using node modules lets you know how things happen under the hood
 });
 
 const PORT = 5000; 
